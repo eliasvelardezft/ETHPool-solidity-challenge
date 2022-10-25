@@ -15,26 +15,26 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 const config: HardhatUserConfig = {
 	defaultNetwork: "hardhat",
 	solidity: "0.8.17",
-	networks: {
-		goerli: {
-			url: GOERLI_RPC_URL,
-			accounts: [GOERLI_PRIVATE_KEY!],
-			chainId: GOERLI_CHAINID,
-		},
-		localhost: {
-			url: LOCALHOST_RPC_URL,
-		},
-	},
-	etherscan: {
-		apiKey: ETHERSCAN_API_KEY,
-	},
-	gasReporter: {
-		enabled: false,
-		outputFile: "gas-report.txt",
-		noColors: true,
-		currency: "USD",
-		coinmarketcap: COINMARKETCAP_API_KEY,
-	},
+	// networks: {
+	// 	goerli: {
+	// 		url: GOERLI_RPC_URL,
+	// 		accounts: [GOERLI_PRIVATE_KEY!],
+	// 		chainId: GOERLI_CHAINID,
+	// 	},
+	// 	localhost: {
+	// 		url: LOCALHOST_RPC_URL,
+	// 	},
+	// },
+	// etherscan: {
+	// 	apiKey: ETHERSCAN_API_KEY,
+	// },
+	// gasReporter: {
+	// 	enabled: false,
+	// 	outputFile: "gas-report.txt",
+	// 	noColors: true,
+	// 	currency: "USD",
+	// 	coinmarketcap: COINMARKETCAP_API_KEY,
+	// },
 };
 
 export default config;
