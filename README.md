@@ -1,6 +1,6 @@
 
 
-# Sample Hardhat Project
+# ETHPool solidity
 This proyect is the solution to the challenge described below.
 ## Thought process
 While it was easy to think of a simple solution that would work with the presented requirements, that solution used loops and we know loops are to be avoided in solidity because of gas cost.  
