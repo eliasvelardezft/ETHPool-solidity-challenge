@@ -28,8 +28,10 @@ https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF
 1. ```yarn install```
 2. ```yarn hardhat test```  
 
-**IMPORTANT:** if you want to run the get-ethpool-total-amount with the actual contract in goerli, you need to create an .env file with the following key:
-```ETHPOOL_CONTRACT_ADDRESS=0x95b83508EEc783F82cFAdd31b5926e991e41bfBF```  
+## IMPORTANT: 
+* if you want to run the get-ethpool-total-amount with the actual contract in goerli, you need to create an .env file with the following key:  
+```ETHPOOL_CONTRACT_ADDRESS=0x95b83508EEc783F82cFAdd31b5926e991e41bfBF```
+* there's a part of the config in hardhat.config.ts that was commented because it needs private env variables to work.  
 
 <br/><br/>
 # Smart Contract Challenge
