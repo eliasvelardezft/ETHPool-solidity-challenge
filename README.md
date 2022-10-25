@@ -1,3 +1,37 @@
+
+
+# Sample Hardhat Project
+This proyect is the solution to the challenge described below.
+## Thought process
+While it was easy to think of a simple solution that would work with the presented requirements, that solution used loops and we know loops are to be avoided in solidity because of gas cost.  
+Imagine if we needed to loop through each and every pool-funder every time the team wanted to give a reward, it would be very expensive.  
+The solution to this problem is to calculate the withdrawable amount when the funder wants to withdraw instead of doing it when the team gives rewards.  
+Another problem was that funders should only get a portion of the rewards that were given **after** they deposited, so I had to find a way to calculate a funder's share of the pool taking into consideration the time when they deposited.
+To solve this, the contract keeps track of two things:  
+1. dividendsPerShare(**DPS**): the proportion between rewards total amount of the pool. If there is 1ETH in the pool and the team gives a reward of 1ETH, now there are 2ETH in the pool and the **DPS** is 1 (1ETH of reward / 1ETH of total amount)
+2. correction(address): because the **DPS** is calculated using the totalAmount (reward/totalAmount), the contract needs to prevent the **DPS** from changing when the totalAmount changes because a funder deposits some ETH. This way, the **DPS** only changes when the team deposits some rewards, and not when the funders deposit money.
+
+This two items make the contract calculate the DPS based on the relation between the rewards and the deposits, which means funders will only get a portion of rewards given **after** they deposited.
+
+## Proyect structure
+1. contracts folder: contains the ETHPool.sol which is the solution's contract.
+2. scripts folder:
+   1. deploy.ts: deploys the and verifies the contract.
+   2. get-ethpool-total-amount.ts: returns the total amount in the contract's pool
+3. test folder: contains a file with the corresponding tests for common cases and both the cases presented in the challenge's github repo.
+4. hardhat.config.ts file: contains the hardhat configuration wich allows us to use different networks (or local environments) to interact with the contract as well as configuration for the gas reporter.  
+
+## Link to the verified contract in Etherscan (Goerli)
+https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF
+
+## Instructions to run the proyect tests locally after cloning
+1. ```yarn install```
+2. ```yarn hardhat test```  
+
+**IMPORTANT:** if you want to run the get-ethpool-total-amount with the actual contract in goerli, you need to create an .env file with the following key:
+```ETHPOOL_CONTRACT_ADDRESS=0x95b83508EEc783F82cFAdd31b5926e991e41bfBF```  
+
+<br/><br/>
 # Smart Contract Challenge
 
 ## A) Challenge
@@ -56,3 +90,4 @@ _You can use any library you prefer: Ethers.js, Web3.js, Web3.py, eth-brownie_
 
 ### 5) Contact
 If you want to apply to this position, please share your solution to our Solidity Challenge to the following email: jobs@exactly.finance
+
