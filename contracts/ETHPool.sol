@@ -4,8 +4,6 @@ pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-error NotOwner();
-error NotTeamMember();
 error UnsuccessfulTransfer();
 error EmptyPoolReward();
 
@@ -36,7 +34,7 @@ contract ETHPool is AccessControl {
 		emit Deposit(msg.sender, msg.value);
 	}
 
-	function reward() external payable onlyTeamMember {
+	function reward() external payable onlyRole(TEAM_MEMBER) {
 		if (!(totalAmount > 0)) revert EmptyPoolReward();
 
 		dividendsPerShare += (msg.value * magnitude) / totalAmount;
@@ -64,19 +62,12 @@ contract ETHPool is AccessControl {
 		return correctedAmount + addressToAmountFunded[sender];
 	}
 
-	// modifiers
-	modifier onlyTeamMember() {
-		if (!(hasRole(TEAM_MEMBER, msg.sender))) revert NotTeamMember();
-		_;
-	}
-
-	modifier onlyOwner() {
-		if (!(hasRole(DEFAULT_ADMIN_ROLE, msg.sender))) revert NotOwner();
-		_;
-	}
-
 	// administration
-	function addTeamMember(address _newTeamMember) external onlyOwner {
+	function addTeamMember(address _newTeamMember) external {
 		grantRole(TEAM_MEMBER, _newTeamMember);
+	}
+
+	function removeTeamMember(address _teamMember) external {
+		revokeRole(TEAM_MEMBER, _teamMember);
 	}
 }

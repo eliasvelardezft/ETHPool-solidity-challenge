@@ -123,14 +123,6 @@ describe("ETHPool", () => {
 
 		assert.equal(expectedBalance, Number(updatedBalance));
 	});
-	it("It should revert if someone who is not a TEAM_MEMBER tried to give rewards", async () => {
-		// we deposit so we can reward later and see if it fails
-		await funderConnectedEthPool.deposit({ value: value1 });
-
-		await expect(
-			funderConnectedEthPool.reward({ value: value100 })
-		).to.be.revertedWithCustomError(ethPool, "NotTeamMember");
-	});
 	// The next test describes the first situation presented in the github repo of the challenge
 	// A deposits 100, and B deposits 300 for a total of 400 in the pool.
 	// Now A has 25% of the pool and B has 75%.
