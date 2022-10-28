@@ -27,7 +27,7 @@ contract ETHPool is AccessControl {
 	uint256 public magnitude = 1e18;
 	uint256 public totalAmount;
 
-	function deposit() public payable {
+	function deposit() external payable {
 		totalAmount += msg.value;
 
 		addressToAmountFunded[msg.sender] += msg.value;
@@ -36,7 +36,7 @@ contract ETHPool is AccessControl {
 		emit Deposit(msg.sender, msg.value);
 	}
 
-	function reward() public payable onlyTeamMember {
+	function reward() external payable onlyTeamMember {
 		if (!(totalAmount > 0)) revert EmptyPoolReward();
 
 		dividendsPerShare += (msg.value * magnitude) / totalAmount;
@@ -45,7 +45,7 @@ contract ETHPool is AccessControl {
 		emit Reward(msg.value);
 	}
 
-	function withdraw() public {
+	function withdraw() external {
 		uint256 correctedWithdrawableAmount = withdrawableAmount(msg.sender);
 
 		(bool success, ) = msg.sender.call{ value: correctedWithdrawableAmount }("");
@@ -76,7 +76,7 @@ contract ETHPool is AccessControl {
 	}
 
 	// administration
-	function addTeamMember(address _newTeamMember) public onlyOwner {
+	function addTeamMember(address _newTeamMember) external onlyOwner {
 		grantRole(TEAM_MEMBER, _newTeamMember);
 	}
 }
