@@ -22,7 +22,8 @@ This two items make the contract calculate the DPS based on the relation between
 4. hardhat.config.ts file: contains the hardhat configuration wich allows us to use different networks (or local environments) to interact with the contract as well as configuration for the gas reporter.  
 
 ## Link to the verified contract in Etherscan (Goerli)
-https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF
+https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF  
+**Note**: The contract in the repo has been updated and will continue to be updated as I learn, so the verified contract in Goerli will probably be outdated
 
 ## Instructions to run the proyect tests locally after cloning
 1. ```yarn install```
