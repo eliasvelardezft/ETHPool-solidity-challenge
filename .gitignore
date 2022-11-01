@@ -21,3 +21,4 @@ interact.ts
 #Hardhat files
 cache
 artifacts
+hardhat.config.ts
