@@ -46,12 +46,16 @@ contract ETHPool is AccessControl {
 	function withdraw() external {
 		uint256 correctedWithdrawableAmount = withdrawableAmount(msg.sender);
 
-		(bool success, ) = msg.sender.call{ value: correctedWithdrawableAmount }("");
-		if (!success) revert UnsuccessfulTransfer();
-
+		// empty sender's amountFunded BEFORE the transfer
+		// to avoid reentrancy attack
+		// (actually because we're using transfer this isn't a problem because of the 2300 gas limit)
 		addressToAmountFunded[msg.sender] = 0;
 		addressToCorrection[msg.sender] = 0;
 		totalAmount -= correctedWithdrawableAmount;
+
+		// (bool success, ) = msg.sender.call{ value: correctedWithdrawableAmount }("");
+		// if (!success) revert UnsuccessfulTransfer();
+		payable(msg.sender).transfer(correctedWithdrawableAmount);
 
 		emit Withdrawal(msg.sender, correctedWithdrawableAmount);
 	}
