@@ -9,7 +9,9 @@ describe("ETHPool", () => {
 		owner: SignerWithAddress,
 		teamMember: SignerWithAddress,
 		funder1: SignerWithAddress,
-		funder2: SignerWithAddress;
+		funder2: SignerWithAddress,
+		magnitude: BigNumber;
+	const sendValue = ethers.utils.parseEther("1");
 	beforeEach(async () => {
 		await deployments.fixture(["all"]);
 		ethPool = await ethers.getContract("ETHPool", owner);
@@ -17,14 +19,13 @@ describe("ETHPool", () => {
 		const accounts = await ethers.getNamedSigners();
 		({ owner, teamMember, funder1, funder2 } = accounts);
 		ethPool.connect(owner).addTeamMember(teamMember.address);
+
+		magnitude = await ethPool.magnitude();
 	});
 	describe("constructor", async () => {});
 	describe("deposit", async () => {
-		const sendValue = ethers.utils.parseEther("1");
-		let magnitude: BigNumber;
 		beforeEach(async () => {
 			await ethPool.deposit({ value: sendValue });
-			magnitude = await ethPool.magnitude();
 		});
 
 		it("Increases totalAmount with the deposited amount", async () => {
@@ -52,13 +53,56 @@ describe("ETHPool", () => {
 			// assert
 			assert.equal(updatedCorrection.toString(), expectedUpdatedCorrection.toString());
 		});
-		it("Emits the Deposit event with params indexed sender and amount", async () => {
+		it("Emits the Deposit event with params sender and amount", async () => {
 			await expect(ethPool.deposit({ value: sendValue }))
 				.to.emit(ethPool, "Deposit")
 				.withArgs(owner.address, sendValue);
 		});
 	});
-	describe("reward", async () => {});
+	describe("reward", async () => {
+		it("Reverts the reward with EmptyPoolReward error if the pool is empty", async () => {
+			await expect(
+				ethPool.connect(teamMember).reward({ value: sendValue })
+			).to.be.revertedWithCustomError(ethPool, "ETHPool__EmptyPoolReward");
+		});
+		it("Increases the dividendsPerShare when a reward is given", async () => {
+			// deposit some eth so a reward can be given without reverting
+			await ethPool.deposit({ value: sendValue });
+			const totalAmountBeforeReward = await ethPool.totalAmount();
+
+			ethPool.connect(teamMember).reward({ value: sendValue });
+			const updatedDividendsPerShare = await ethPool.dividendsPerShare();
+			const expectedUpdatedDividendsPerShare = sendValue
+				.mul(magnitude)
+				.div(totalAmountBeforeReward);
+
+			assert.equal(
+				updatedDividendsPerShare.toString(),
+				expectedUpdatedDividendsPerShare.toString()
+			);
+		});
+		it("Increases the totalAmount with the rewarded amount", async () => {
+			// deposit some eth so a reward can be given without reverting
+			await ethPool.deposit({ value: sendValue });
+
+			const totalAmountBeforeReward = await ethPool.totalAmount();
+
+			ethPool.connect(teamMember).reward({ value: sendValue });
+
+			const updatedTotalAmount = await ethPool.totalAmount();
+			const expectedUpdatedTotalAmount = totalAmountBeforeReward.add(sendValue);
+
+			assert.equal(updatedTotalAmount.toString(), expectedUpdatedTotalAmount.toString());
+		});
+		it("Emits the Deposit event with param amount", async () => {
+			// deposit some eth so a reward can be given without reverting
+			await ethPool.deposit({ value: sendValue });
+
+			await expect(ethPool.connect(teamMember).reward({ value: sendValue }))
+				.to.emit(ethPool, "Reward")
+				.withArgs(sendValue);
+		});
+	});
 	describe("withdraw", async () => {});
 	describe("withdrawableAmount", async () => {});
 	describe("addTeamMember", async () => {});
