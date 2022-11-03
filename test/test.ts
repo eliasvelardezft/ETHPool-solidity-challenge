@@ -175,6 +175,52 @@ describe("ETHPool", () => {
 			assert.equal(withdrawableAmount.toString(), expectedWithdrawableAmount.toString());
 		});
 	});
+	describe("Challenge specific situations", async () => {
+		// The next test describes the first situation presented in the github repo of the challenge
+		// Let say we have user funder1 and funder2 and team T.
+		// funder1 deposits 100, and funder2 deposits 300 for a total of 400 in the pool.
+		// Now funder1 has 25% of the pool and funder2 has 75%.
+		// When T deposits 200 rewards, funder1 should be able to withdraw 150 and funder2 450.
+		it("Situation 1", async () => {
+			// funder1 deposits 100
+			await ethPool.connect(funder1).deposit({ value: ethers.utils.parseEther("100") });
+
+			// funder2 deposits 300
+			await ethPool.connect(funder2).deposit({ value: ethers.utils.parseEther("300") });
+
+			// T rewards 200
+			await ethPool.connect(teamMember).reward({ value: ethers.utils.parseEther("200") });
+
+			const withdrawableAmountA = await ethPool.withdrawableAmount(funder1.address);
+			const withdrawableAmountB = await ethPool.withdrawableAmount(funder2.address);
+
+			assert.equal(withdrawableAmountA.toString(), ethers.utils.parseEther("150").toString());
+			assert.equal(withdrawableAmountB.toString(), ethers.utils.parseEther("450").toString());
+		});
+		// The next test describes the second situation presented in the github repo of the challenge
+		// What if the following happens?
+		// funder1 deposits then T deposits then funder2 deposits then funder1 withdraws and finally funder2 withdraws.
+		// funder1 should get their deposit + all the rewards.
+		// funder2 should only get their deposit because rewards were sent to the pool before they participated.
+		it("Situation 2", async () => {
+			// funder1 deposits 100
+			await ethPool.connect(funder1).deposit({ value: ethers.utils.parseEther("100") });
+
+			// T rewards 200
+			await ethPool.connect(teamMember).reward({ value: ethers.utils.parseEther("200") });
+
+			// funder2 deposits 200
+			await ethPool.connect(funder2).deposit({ value: ethers.utils.parseEther("200") });
+
+			const withdrawableAmount1 = await ethPool.withdrawableAmount(funder1.address);
+			const withdrawableAmount2 = await ethPool.withdrawableAmount(funder2.address);
+
+			// funder1 gets 300 because they deposited 100 and T rewarded 200
+			// BEFORE funder2 deposited 200, so funder2 only gets 200.
+			assert.equal(withdrawableAmount1.toString(), ethers.utils.parseEther("300").toString());
+			assert.equal(withdrawableAmount2.toString(), ethers.utils.parseEther("200").toString());
+		});
+	});
 	describe("addTeamMember", async () => {
 		it("Sets the account as TEAM_MEMBER_ROLE", async () => {
 			await ethPool.connect(owner).addTeamMember(funder1.address);
