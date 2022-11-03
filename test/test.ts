@@ -150,7 +150,31 @@ describe("ETHPool", () => {
 				.withArgs(funder1.address, sendValue);
 		});
 	});
-	describe("withdrawableAmount", async () => {});
+	describe("withdrawableAmount", async () => {
+		// uint256 uncorrectedPortionOfDividends = (dividendsPerShare * addressToAmountFunded[sender]) / magnitude;
+		// uint256 correctedPortionOfDividends = uncorrectedPortionOfDividends - addressToCorrection[sender];
+		// return correctedPortionOfDividends + addressToAmountFunded[sender];
+		it("Returns the amount funded + the portion of the rewards corresponding to the address", async () => {
+			// deposit to allow reward
+			await ethPool.connect(funder1).deposit({ value: sendValue });
+			// reward to increase dividendsPerShare
+			await ethPool.connect(teamMember).deposit({ value: sendValue });
+			// deposit again to generate a correction
+			await ethPool.connect(funder1).deposit({ value: sendValue });
+
+			const dividendsPerShare = await ethPool.dividendsPerShare();
+			const amountFunded = await ethPool.addressToAmountFunded(funder1.address);
+			const correction = await ethPool.addressToCorrection(funder1.address);
+			const uncorrectedPortionOfDividends = dividendsPerShare
+				.mul(amountFunded)
+				.div(magnitude);
+			const correctedPortionOfDividends = uncorrectedPortionOfDividends.sub(correction);
+
+			const expectedWithdrawableAmount = correctedPortionOfDividends.add(amountFunded);
+			const withdrawableAmount = await ethPool.withdrawableAmount(funder1.address);
+			assert.equal(withdrawableAmount.toString(), expectedWithdrawableAmount.toString());
+		});
+	});
 	describe("addTeamMember", async () => {});
 	describe("removeTeamMember", async () => {});
 });
