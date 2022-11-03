@@ -117,7 +117,39 @@ describe("ETHPool", () => {
 				.withArgs(sendValue);
 		});
 	});
-	describe("withdraw", async () => {});
+	describe("withdraw", async () => {
+		beforeEach(async () => {
+			await ethPool.connect(funder1).deposit({ value: sendValue });
+		});
+		it("Empties the senders amountFunded", async () => {
+			await ethPool.connect(funder1).withdraw();
+			const updatedAmountFunded = await ethPool.addressToAmountFunded(funder1.address);
+			assert.equal(updatedAmountFunded.toString(), "0");
+		});
+		it("Empties the senders correction", async () => {
+			await ethPool.connect(funder1).withdraw();
+			const updatedCorrection = await ethPool.addressToCorrection(funder1.address);
+			assert.equal(updatedCorrection.toString(), "0");
+		});
+		it("Transfers the corrected withdrawable amount to the sender", async () => {
+			const balanceBeforeWithdrawal = await ethPool.provider.getBalance(funder1.address);
+
+			const withdrawTxResponse = await ethPool.connect(funder1).withdraw();
+			const withdrawTxReceipt = await withdrawTxResponse.wait();
+			const { gasUsed, effectiveGasPrice } = withdrawTxReceipt;
+
+			const updatedBalance = await ethPool.provider.getBalance(funder1.address);
+			const expectedUpdatedBalance = balanceBeforeWithdrawal
+				.add(sendValue)
+				.sub(gasUsed.mul(effectiveGasPrice));
+			assert.equal(updatedBalance.toString(), expectedUpdatedBalance.toString());
+		});
+		it("Emits Withdrawal event with params sender, amount", async () => {
+			await expect(await ethPool.connect(funder1).withdraw())
+				.to.emit(ethPool, "Withdrawal")
+				.withArgs(funder1.address, sendValue);
+		});
+	});
 	describe("withdrawableAmount", async () => {});
 	describe("addTeamMember", async () => {});
 	describe("removeTeamMember", async () => {});
