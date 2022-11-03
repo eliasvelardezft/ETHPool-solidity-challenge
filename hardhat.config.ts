@@ -21,7 +21,7 @@ const config: HardhatUserConfig = {
 		goerli: {
 			url: GOERLI_RPC_URL,
 			accounts: [GOERLI_PRIVATE_KEY!],
-			chainId: GOERLI_CHAINID,
+			chainId: +GOERLI_CHAINID!,
 		},
 		localhost: {
 			url: LOCALHOST_RPC_URL,
@@ -38,18 +38,10 @@ const config: HardhatUserConfig = {
 		coinmarketcap: COINMARKETCAP_API_KEY,
 	},
 	namedAccounts: {
-		owner: {
-			default: 0,
-		},
-		teamMember: {
-			default: 1,
-		},
-		funder1: {
-			default: 2,
-		},
-		funder2: {
-			default: 3,
-		},
+		owner: 0,
+		teamMember: 1,
+		funder1: 2,
+		funder2: 3,
 	},
 };
 
