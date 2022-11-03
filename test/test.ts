@@ -10,7 +10,9 @@ describe("ETHPool", () => {
 		teamMember: SignerWithAddress,
 		funder1: SignerWithAddress,
 		funder2: SignerWithAddress,
-		magnitude: BigNumber;
+		magnitude: BigNumber,
+		DEFAULT_ADMIN_ROLE: string,
+		TEAM_MEMBER_ROLE: string;
 	const sendValue = ethers.utils.parseEther("1");
 	beforeEach(async () => {
 		await deployments.fixture(["all"]);
@@ -21,8 +23,20 @@ describe("ETHPool", () => {
 		ethPool.connect(owner).addTeamMember(teamMember.address);
 
 		magnitude = await ethPool.magnitude();
+		DEFAULT_ADMIN_ROLE = await ethPool.DEFAULT_ADMIN_ROLE();
+		TEAM_MEMBER_ROLE = await ethPool.TEAM_MEMBER_ROLE();
 	});
-	describe("constructor", async () => {});
+	describe("constructor", async () => {
+		it("Sets the deployer as OpenZeppelin DEFAULT_ADMIN_ROLE", async () => {
+			const isAdmin = await ethPool.hasRole(DEFAULT_ADMIN_ROLE, owner.address);
+			assert.isTrue(isAdmin);
+		});
+		it("Sets the deployer as TEAM_MEMBER (so they can also reward)", async () => {
+			const TEAM_MEMBER_ROLE = await ethPool.TEAM_MEMBER_ROLE();
+			const isTeamMember = await ethPool.hasRole(TEAM_MEMBER_ROLE, owner.address);
+			assert.isTrue(isTeamMember);
+		});
+	});
 	describe("deposit", async () => {
 		beforeEach(async () => {
 			await ethPool.deposit({ value: sendValue });
