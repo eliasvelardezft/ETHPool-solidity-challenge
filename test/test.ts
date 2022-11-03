@@ -10,7 +10,7 @@ describe("ETHPool", () => {
 		teamMember: SignerWithAddress,
 		funder1: SignerWithAddress,
 		funder2: SignerWithAddress,
-		magnitude: BigNumber,
+		MAGNITUDE: BigNumber,
 		DEFAULT_ADMIN_ROLE: string,
 		TEAM_MEMBER_ROLE: string;
 	const sendValue = ethers.utils.parseEther("1");
@@ -22,7 +22,7 @@ describe("ETHPool", () => {
 		({ owner, teamMember, funder1, funder2 } = accounts);
 		ethPool.connect(owner).addTeamMember(teamMember.address);
 
-		magnitude = await ethPool.magnitude();
+		MAGNITUDE = await ethPool.MAGNITUDE();
 		DEFAULT_ADMIN_ROLE = await ethPool.DEFAULT_ADMIN_ROLE();
 		TEAM_MEMBER_ROLE = await ethPool.TEAM_MEMBER_ROLE();
 	});
@@ -60,9 +60,9 @@ describe("ETHPool", () => {
 
 			const updatedCorrection = await ethPool.addressToCorrection(owner.address);
 
-			// correction = value * dividendsPerShare / magnitude
+			// correction = value * dividendsPerShare / MAGNITUDE
 			const dividendsPerShare = await ethPool.dividendsPerShare();
-			const expectedUpdatedCorrection = sendValue.mul(dividendsPerShare).div(magnitude);
+			const expectedUpdatedCorrection = sendValue.mul(dividendsPerShare).div(MAGNITUDE);
 
 			// assert
 			assert.equal(updatedCorrection.toString(), expectedUpdatedCorrection.toString());
@@ -87,7 +87,7 @@ describe("ETHPool", () => {
 			ethPool.connect(teamMember).reward({ value: sendValue });
 			const updatedDividendsPerShare = await ethPool.dividendsPerShare();
 			const expectedUpdatedDividendsPerShare = sendValue
-				.mul(magnitude)
+				.mul(MAGNITUDE)
 				.div(totalAmountBeforeReward);
 
 			assert.equal(
@@ -151,7 +151,7 @@ describe("ETHPool", () => {
 		});
 	});
 	describe("withdrawableAmount", async () => {
-		// uint256 uncorrectedPortionOfDividends = (dividendsPerShare * addressToAmountFunded[sender]) / magnitude;
+		// uint256 uncorrectedPortionOfDividends = (dividendsPerShare * addressToAmountFunded[sender]) / MAGNITUDE;
 		// uint256 correctedPortionOfDividends = uncorrectedPortionOfDividends - addressToCorrection[sender];
 		// return correctedPortionOfDividends + addressToAmountFunded[sender];
 		it("Returns the amount funded + the portion of the rewards corresponding to the address", async () => {
@@ -167,7 +167,7 @@ describe("ETHPool", () => {
 			const correction = await ethPool.addressToCorrection(funder1.address);
 			const uncorrectedPortionOfDividends = dividendsPerShare
 				.mul(amountFunded)
-				.div(magnitude);
+				.div(MAGNITUDE);
 			const correctedPortionOfDividends = uncorrectedPortionOfDividends.sub(correction);
 
 			const expectedWithdrawableAmount = correctedPortionOfDividends.add(amountFunded);

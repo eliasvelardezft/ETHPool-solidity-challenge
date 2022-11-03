@@ -16,7 +16,7 @@ contract ETHPool is AccessControl {
 	mapping(address => uint256) public addressToAmountFunded;
 	mapping(address => uint256) public addressToCorrection;
 	uint256 public dividendsPerShare;
-	uint256 public magnitude = 1e18;
+	uint256 public constant MAGNITUDE = 1e18;
 	uint256 public totalAmount;
 
 	constructor() {
@@ -28,7 +28,7 @@ contract ETHPool is AccessControl {
 		totalAmount += msg.value;
 
 		addressToAmountFunded[msg.sender] += msg.value;
-		addressToCorrection[msg.sender] += (msg.value * dividendsPerShare) / magnitude;
+		addressToCorrection[msg.sender] += (msg.value * dividendsPerShare) / MAGNITUDE;
 
 		emit Deposit(msg.sender, msg.value);
 	}
@@ -36,7 +36,7 @@ contract ETHPool is AccessControl {
 	function reward() external payable onlyRole(TEAM_MEMBER_ROLE) {
 		if (!(totalAmount > 0)) revert ETHPool__EmptyPoolReward();
 
-		dividendsPerShare += (msg.value * magnitude) / totalAmount;
+		dividendsPerShare += (msg.value * MAGNITUDE) / totalAmount;
 		totalAmount += msg.value;
 
 		emit Reward(msg.value);
@@ -61,7 +61,7 @@ contract ETHPool is AccessControl {
 
 	function withdrawableAmount(address sender) public view returns (uint256) {
 		uint256 uncorrectedPortionOfDividends = (dividendsPerShare *
-			addressToAmountFunded[sender]) / magnitude;
+			addressToAmountFunded[sender]) / MAGNITUDE;
 		uint256 correctedPortionOfDividends = uncorrectedPortionOfDividends -
 			addressToCorrection[sender];
 		return correctedPortionOfDividends + addressToAmountFunded[sender];
