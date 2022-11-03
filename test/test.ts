@@ -175,6 +175,18 @@ describe("ETHPool", () => {
 			assert.equal(withdrawableAmount.toString(), expectedWithdrawableAmount.toString());
 		});
 	});
-	describe("addTeamMember", async () => {});
-	describe("removeTeamMember", async () => {});
+	describe("addTeamMember", async () => {
+		it("Sets the account as TEAM_MEMBER_ROLE", async () => {
+			await ethPool.connect(owner).addTeamMember(funder1.address);
+			const isTeamMember = await ethPool.hasRole(TEAM_MEMBER_ROLE, funder1.address);
+			assert.isTrue(isTeamMember);
+		});
+	});
+	describe("removeTeamMember", async () => {
+		it("Removes TEAM_MEMBER_ROLE from account", async () => {
+			await ethPool.connect(owner).removeTeamMember(teamMember.address);
+			const isTeamMember = await ethPool.hasRole(TEAM_MEMBER_ROLE, teamMember.address);
+			assert.isFalse(isTeamMember);
+		});
+	});
 });
