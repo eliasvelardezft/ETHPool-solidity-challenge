@@ -16,10 +16,12 @@ This two items make the contract calculate the DPS based on the relation between
 ## Proyect structure
 1. contracts folder: contains the ETHPool.sol which is the solution's contract.
 2. scripts folder:
-   1. deploy.ts: deploys the and verifies the contract.
-   2. get-ethpool-total-amount.ts: returns the total amount in the contract's pool
-3. test folder: contains a file with the corresponding tests for common cases and both the cases presented in the challenge's github repo.
-4. hardhat.config.ts file: contains the hardhat configuration wich allows us to use different networks (or local environments) to interact with the contract as well as configuration for the gas reporter.  
+   1. get-ethpool-total-amount.ts: returns the total amount in the contract's pool
+3. test folder: contains a file with the corresponding tests for all methods and both the cases presented in the challenge's github repo.  
+4. deploy folder: contains a file that hardhat will use when calling ```yarn hardhat deploy```  
+5. verify.ts file in utils folder: is called in the deploy file when deploying in goerli. It verifies the contract in Etherscan if the corresponding api key is provided.
+6. hardhat.config.ts file: contains the hardhat configuration wich allows us to use different networks (or local environments) to interact with the contract as well as configuration for the gas reporter.  
+7. helper-hardhat-config.ts file: contains constants helpful for config purposes.
 
 ## Link to the verified contract in Etherscan (Goerli)
 https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF  
@@ -32,7 +34,7 @@ https://goerli.etherscan.io/address/0x95b83508EEc783F82cFAdd31b5926e991e41bfBF
 ## IMPORTANT: 
 * if you want to run the get-ethpool-total-amount with the actual contract in goerli, you need to create an .env file with the following key:  
 ```ETHPOOL_CONTRACT_ADDRESS=0x95b83508EEc783F82cFAdd31b5926e991e41bfBF```
-* there's a part of the config in hardhat.config.ts that was commented because it needs private env variables to work.  
+* The file ```helper-hardhat-config.ts``` contains the names of all the env variables needed for the proyect to function correctly  
 
 <br/><br/>
 # Smart Contract Challenge
